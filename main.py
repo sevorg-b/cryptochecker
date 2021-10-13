@@ -1,18 +1,27 @@
 import yfinance as yf
+import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 import streamlit as st
 
-btc = yf.Ticker("BTC-USD")
-df = btc.history(start = "2020-01-01", end = "2020-06-01")
+tickers = pd.read_csv("data/ticker_list.csv")
 
-print(df.columns)
+symbols = ["BTC", "ETH", "D", "MSFT"]
 
+st.title("Crypto tracker")
+option = st.selectbox("Please select a ticker:", symbols)
 
-def open_close_plot (data):
-    plt.plot(data['Open'], "g", linestyle = "-", linewidth = 1.5)
-    plt.plot(data['Close'], "r", linestyle = "-", linewidth = 1.5)
-    plt.legend(['Open', 'Close'])
-    return plt.show()
+start_date = st.date_input('Start date :')
+end_date = st.date_input('Finish date:')
 
+chosen_symbol = yf.Ticker(option)
+df = chosen_symbol.history(start = start_date, end = end_date)
 
-open_close_plot(df)
+# def open_close_plot():
+#     plt.figure(dpi=500)
+#     fig = sns.lineplot(df['Open'], df['Close'])
+#     return st.pyplot(fig = fig)
+
+chart_data = df[['Open', 'Close']]
+
+st.line_chart(chart_data)
